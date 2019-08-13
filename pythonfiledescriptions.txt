@@ -1,0 +1,20 @@
+conversioncode2.py - takes the non-ascii characters out of the csv files - could 
+
+addinfo2.py - takes the output of conversioncode.py and collates information from the title of the dataframe 
+
+edit2.py - reads through the collection and set up data and uses that to process the data logger data (from addinfo.py)
+moves any problem files to ProblemFiles folder
+
+
+merge2.py - compiles all the dataframes into a single merge.csv file
+
+dailyData.py - cre
+
+pointData.py - takes the merged data and creates a dataframe where each row is a point with all microclimate for that point summarised
+
+VegPlotData.py - processes the data from the Lombok Veg plots so that it is useable here. Each row is the data for one veg plot. 
+
+lidar_veg.py - this processes the lidar data and appends ates a spreadsheet where each row is a day of microclimate data summarised for each point
+it with the vegplotdata.py data to the pointdata.py data
+
+dungbeetle.py - appends dung beetle community data to the lidar_veg data
