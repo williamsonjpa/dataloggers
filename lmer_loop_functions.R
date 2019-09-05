@@ -130,10 +130,11 @@ subset_AICtables <- function( table_list , cutoff ){
   return( table_list )
 }
 
-## Function 5: subset the AICtable list based on weight cumulative count
+## Function 5: add model terms to the AIC table 
 ## Arguments:
 ##   AICtable_list:list of ICtab class AIC tables that have been subsetted by func 4
-##   var_combs_vec: character vector with model combinations
+##   var_combs_vec: character vector with model varaible combinations
+##   exp_vars: character vector with model variables
 match_AICtabs_with_exp_vars <- function( AICtable_list , var_combs_vec , exp_vars ){
   
   # looop over AIC tables
@@ -163,9 +164,26 @@ match_AICtabs_with_exp_vars <- function( AICtable_list , var_combs_vec , exp_var
       }
       
     }
-    print(df)
+    AICtable_list[[ i ]] <- df
   }
   return( AICtable_list )
+}
+
+## Function 5: subset the AICtable list based on weight cumulative count
+## Arguments:
+##   AICtable_list:list of ICtab class AIC tables that have been subsetted by func 4
+##   exp_vars: character vector with model variables
+
+generate_output_table <- function( AICtable_list , exp_vars ){
+ 
+  output <- as.data.frame( names( AICtable_list ) ) 
+  for( i in AICtable_list ){
+    df <- AICtable_list[[ i ]]
+    
+    
+    
+    
+  }
 }
 
 # Ben Bolker's AIC table to dataframe function

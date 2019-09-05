@@ -102,4 +102,4 @@ AICtable_list <- match_AICtabs_with_exp_vars( AICtable_list = AICtable_list , va
 
 # 10. model ouput table.
 source( "lmer_loop_functions.R" )
-all_models_output_table <- generate_output_table( AICtable_list )
+all_models_output_table <- generate_output_table( AICtable_list = AICtable_list , exp_vars = vars )
