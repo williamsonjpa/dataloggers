@@ -9,8 +9,8 @@ import pandas as pd
 def pointSummaryData(infile,outfile):
     merged = pd.read_csv(infile)
     print('Dataframe loaded.')
-  
-    location=['Point','Position','loggerID','River','LandUse']
+
+    location=['Point','Position','loggerID','River','LandUse','long','lat','setup_date']
 
     microclimate=['Celsius(C)','Humidity(%rh)','Dew Point(C)','VPD']
 

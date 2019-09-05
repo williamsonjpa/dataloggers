@@ -3,6 +3,7 @@ import os
 import glob
 import os.path
 import pandas as pd
+import numpy as np
 
 def iterate_edit2(root,setup,collection):
     '''
@@ -42,11 +43,11 @@ def iterate_edit2(root,setup,collection):
 
 def remove_useless_data(root,infile,setup,collection,fail_list):
     '''
-    A function to edit the datalogger files that have already had info added and been 
+    A function to edit the datalogger files that have already had info added and been
     converted to ASCII characters only.
     Start and end datetimes are read from the setup and collecion files so that
     we can make sure we only use data from when the logger was in position.
-    Failed dataloggers are moved to folders that are sorted by the problems that 
+    Failed dataloggers are moved to folders that are sorted by the problems that
     caused failure, e.g. failure to match to datasets, no recorded data within datetime
     window...
     Number of days of recording is appended to each datalogger column.
@@ -119,17 +120,29 @@ def generate_setup_date_time(setup,infile,river,loggerID,position,point):
         df_s.loc[i,'Data logger point'].lower().replace(" ", "") == position.lower():
             date = df_s.loc[i,'Date']
             time = df_s.loc[i,'Time put out']
+            if np.isnan(df_s.loc[i,'Coordinate- E']) != True:
+                long = df_s.loc[i,'Coordinate- E']
+            else:
+                long='NA'
+            if np.isnan(df_s.loc[i,'Coordinate- N']) != True:
+                lat = df_s.loc[i,'Coordinate- N']
+            else:
+                lat='NA'
             duplicateError += 1
 
     #check there has only been one match
     if duplicateError > 1:
         date = 'MULTIPLEMATCHES'
         time = 'MULTIPLEMATCHES'
+        long='NA'
+        lat='NA'
     elif duplicateError == 0:
         date = 'NOMATCH'
         time = 'NOMATCH'
+        long='NA'
+        lat='NA'
 
-    return (date,time)
+    return (date,time,long,lat)
 
 def generate_collection_date_time(collection,infile,river,loggerID,position,point):
     '''
@@ -180,7 +193,7 @@ def check_for_date_time_errors(root,startDateTime,endDateTime,infile,df):
         return 'PASSED'
 
 def process_date_time_errors(fail_list,infile):
-    ''' 
+    '''
     returns a fail_list with the failed file appended to the end of it
 
     '''
@@ -199,7 +212,7 @@ def process_cut_off_times(root,df,startDateTime,endDateTime,infile,error_result)
         elif error_result == 'BATTERY':
             df.to_csv(root + '/Data/ProblemFiles/BatteryErrors/' + infile.split('/')[-1])
 
-            
+
     elif error_result == 'FAILED':
         pass
 
@@ -211,12 +224,16 @@ def process_cut_off_times(root,df,startDateTime,endDateTime,infile,error_result)
 
 def cut_off_start_date_time(df,startDateTime,error_result):
     '''
-    returns a dataframe (df) where the all times before 12:00pm after the set up date time 
+    returns a dataframe (df) where the all times before 12:00pm after the set up date time
     have been deleted
     '''
     #varaibles to check if the date and time have already been found in the dataframe
     date_found = 0
     time_found = 0
+    df.loc[:,'long'] = startDateTime[2]
+    df.loc[:,'lat'] = startDateTime[3]
+    df.loc[:,'setup_date'] = startDateTime[0]
+
 
     for i in df.index:
         #if the date has not yet been found
@@ -243,7 +260,7 @@ def cut_off_start_date_time(df,startDateTime,error_result):
         #otherwise it must be a battery failing before it recorded
         else:
             error_result='BATTERY'
-    
+
     return (df,error_result)
 
 def cut_off_end_date_time(df,endDateTime):
@@ -270,7 +287,7 @@ def cut_off_end_date_time(df,endDateTime):
 
     return df
 
-    
+
 
 
 def calculate_days_in_field(df):
@@ -281,8 +298,8 @@ def calculate_days_in_field(df):
     ##convert to datetime format (may need to be fixed, date is in DD/MM/YYYY format)
     df['DateTime'] = pd.to_datetime(df['Date'])
     # create the new column by subtracting start date from last date on df
-    df['days_recorded']=df['DateTime'].iloc[len(df['DateTime'])-1]-df['DateTime'].iloc[0]
-    
+    df['days_recorded']=str(df['DateTime'].iloc[len(df['DateTime'])-1]-df['DateTime'].iloc[0]).split(' ')[0]
+
     return df
 
 

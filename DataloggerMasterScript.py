@@ -9,15 +9,17 @@ from append2 import iterate_append
 from VPD import iterate_VPD_script
 from SummarisePointData import pointSummaryData
 from SummariseDailyData import dailySummaryData
+from lidar_veg_point_TS import combineDatasets
+
 '''
-one script that will run all the other python scripts until you have your output 
+one script that will run all the other python scripts until you have your output
 datalogger documents. This should be useful for future use or for others to also
 run this code
 
 for this to work you must edit the root and non-datalogger filenames below
 be sure to include a / at the start of the filenames
 
-the Dataloggers folder should have a /Code folder with the python scripts already 
+the Dataloggers folder should have a /Code folder with the python scripts already
 inside it and a Data/Raw/ folder with the raw data folders within it
 
 '''
@@ -46,23 +48,41 @@ lidar_data = '/Data/Final/lidar.csv'
 #strips info from the title to allow removal of incorrect/irrelevant data
 #iterate_addinfo2(root)
 
-#removes incorrect and irrelevant data from the datalogger files, 
-#also sorts files that dont work into folders within the Data/ProblemFiles directory
+#removes incorrect and irrelevant data from the datalogger files,
+# #also sorts files that dont work into folders within the Data/ProblemFiles directory
 # iterate_edit2(root, setup, collection)
-
-# #adds in the width and elevation and distance from edge/river data to the logger files
-# #eventually this should also append lidar and vegplot data probably...
-#iterate_append(root, root + site_data, root + veg_plot_data, root + lidar_data)
-
-
-# #merges all the files into one file named merge.csv
+# #
+# # # #adds in the width and elevation and distance from edge/river data to the logger files
+# # # #eventually this should also append lidar and vegplot data probably...
+# iterate_append(root, root + site_data, root + veg_plot_data, root + lidar_data)
+# #
+# #
+# # # # #merges all the files into one file named merge.csv
 # merge(root)
-
-#adds VPD column to dataset
-#iterate_VPD_script(root+'/Data/Final/merge.csv',root+'/Data/Final/merge2.csv')
-
-# generate average data by point
-pointSummaryData(root+'/Data/Final/merge2.csv',root+'/Data/Final/PointData.csv')
-
-# generate average data by day
+#
+# #adds VPD column to data+'/set
+# iterate_VPD_script(root+'/Data/Final/merge.csv',root+'/Data/Final/merge2.csv')
+#
+# # # generate average data by point
+# pointSummaryData(root+'/Data/Final/merge2.csv',root+'/Data/Final/PointData.csv')
+#
+# # # generate average data by day
 dailySummaryData(root+'/Data/Final/merge2.csv',root+'/Data/Final/DailyData.csv')
+
+# add the lidar data from tom swinfield, add the vegplot data and point data
+# combineDatasets(root+'/Data/Final/vegplotData.csv',
+# 	root+'/Data/Vegetation/TS_Files_New/SAFE/datalogger_points_with_dist_edge_JW_topo_scale_12.5.csv',
+# 	root+'/Data/Vegetation/TS_Files_New/SAFE/datalogger_points_with_dist_edge_JW_scale_12.5.csv',
+# 	root+'/Data/Vegetation/TS_Files_New/SAFE/datalogger_points_with_dist_edge_JW_tch_scale_12.5.csv',
+# 	root+'/Data/Final/PointData.csv',
+# 	root+'/Data/Vegetation/allpoints.xlsx',
+# 	root+'/Data/Final/Combined_Point_scale_12.5.csv')
+
+#see above but for daily data
+combineDatasets(root+'/Data/Final/vegplotData.csv',
+	root+'/Data/Vegetation/TS_Files_New/SAFE/datalogger_points_with_dist_edge_JW_topo_scale_12.5.csv',
+	root+'/Data/Vegetation/TS_Files_New/SAFE/datalogger_points_with_dist_edge_JW_scale_12.5.csv',
+	root+'/Data/Vegetation/TS_Files_New/SAFE/datalogger_points_with_dist_edge_JW_tch_scale_12.5.csv',
+	root+'/Data/Final/DailyData.csv',
+	root+'/Data/Vegetation/allpoints.xlsx',
+	root+'/Data/Final/Combined_Daily_scale_12.5.csv')

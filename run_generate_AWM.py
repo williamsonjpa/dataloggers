@@ -1,9 +1,7 @@
 import pandas as pd
 from generate_AWM_functions import *
 
-root = 'C:/Users/hp/Documents/2018/Dataloggers/Data/'
-root_dung = 'C:/Users/hp/Documents/Dung_Beetles/'
-root_thermal = 'C:/Users/hp/Documents/2018/Thermal/'
+root = '/home/joe/Documents/'
 
 def trait_and_abundance_append(abundance_microclimate_data,first_species_col,last_species_col,\
   traitData, trait_cols, species_col,outfile):
@@ -19,7 +17,7 @@ def trait_and_abundance_append(abundance_microclimate_data,first_species_col,las
 
 	#load dung beetle trait data
 	xl=pd.ExcelFile(traitData)
-	traits=xl.parse(xl.sheet_names[0]) 
+	traits=xl.parse(xl.sheet_names[0])
 
 	#generate a dataframe of the mean traits for each species
 	mean_traits=generate_mean_traits(traits,trait_cols,species_col)
@@ -32,10 +30,10 @@ def trait_and_abundance_append(abundance_microclimate_data,first_species_col,las
 
 	print('Output saved as ' + outfile + '.')
 
-trait_and_abundance_append(root_dung + 'Abundance_Datasets_Combined_Manually_Edited.csv',\
+trait_and_abundance_append(root + '/Dung_Beetles/Abundance_Datasets_Combined_gps.csv',\
 	'Caccobius bawangensis','Panelus sp. 2',\
-	root_thermal + 'thermal.data.2018.processed.xlsx',\
+	root + 'Thermal/thermal.data.2018.processed.xlsx',\
 	['ctmax','length','pro.width'],\
 	'new_binomial_name',\
-	root_thermal + 'all_abundance_microclimate_traits.csv'\
+	root + 'Thermal/Data/all_abundance_microclimate_traits.csv'\
 	)

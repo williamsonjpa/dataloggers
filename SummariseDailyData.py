@@ -9,8 +9,8 @@ import pandas as pd
 def dailySummaryData(infile,outfile):
     merged = pd.read_csv(infile)
     print('Dataframe loaded.')
-  
-    location=['Point','Position','loggerID','River','Date','LandUse']
+
+    location=['Point','Position','loggerID','River','Date','LandUse','lat','long']
     #,'width','GPS_ele',\
     # 'Distance_from_edge','Distance_from_river','LandUseBins'
 
@@ -27,7 +27,4 @@ def dailySummaryData(infile,outfile):
 
     concat_df.to_csv(outfile)
 
-
-
-
-
+    print('Dataframe summarised by day.')

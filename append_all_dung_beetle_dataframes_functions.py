@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 '''
 functions to append all the dung beetle data together from the SAFE fragments, rivers and the Newton rivers
@@ -22,9 +23,10 @@ def generate_matching_point_codes_rivers(data_rivers,point_col):
 	#change to the safe format with L for lombok and RT for riparian transect
 	rivers = convert_to_safe_codes(rivers,point_col)
 
+
 	return rivers
 
-	
+
 def add_in_zeros_to_sites(data, point_col):
 
 	'''
@@ -102,6 +104,8 @@ def generate_matching_point_codes_newton(data, point_cols):
 	#removes the rop from riparian buffer codes and changes RT to ROP as prefix of code
 	newton = remove_rop(newton, 'Site')
 
+
+
 	return newton
 
 
@@ -135,21 +139,25 @@ def fix_lfe_code(data, point_col):
 def remove_rr(data, point_col):
 	'''
 	removes the rr tag from the river codes and changes RT to RR for riparian buffers
-	i.e. RT_RR12_L_01 becomes RR_12_L_01 
+	i.e. RT_RR12_L_01 becomes RR_12_L_01
 	'''
 
 	for i in data.index:
 		split_point = data.loc[i,point_col].split('_')
-		if split_point[1][:2] == 'RR':
+		if split_point[1][:2] == 'RR' and split_point[1] != 'RR5/30':
 			data.loc[i,point_col] = str('RR_' + split_point[1][2:] + '_L_' + split_point[3])
 		elif split_point[1][:3].upper() == 'SJI':
 			data.loc[i,point_col] = str('RR_' + split_point[1] + '_L_' + split_point[3])
+		elif split_point[1] == 'RR5/30':
+			data.loc[i,point_col] = str('RT_' + split_point[1][2:] + '_L_' + split_point[3])
+
+
 	return data
 
 def remove_rop(data, point_col):
 	'''
 	removes the rr tag from the river codes and changes RT to RR for riparian buffers
-	i.e. RT_ROP2_L_01 becomes ROP_2_L_01 and 
+	i.e. RT_ROP2_L_01 becomes ROP_2_L_01 and
 	'''
 
 	for i in data.index:
@@ -158,6 +166,27 @@ def remove_rop(data, point_col):
 			data.loc[i,point_col] = str('ROP_' + split_point[1][3:] + '_L_' + split_point[3])
 
 	return data
+
+def remove_na_rows(df):
+	'''
+	remove any rows that do not have values for Catharsius dayacus
+	'''
+	for row in df.index:
+		if np.isnan(df.loc[row,'Catharsius dayacus']) == True:	#if the value for C. dayacus is NaN
+			df = df.drop(row)
+
+	return df
+
+def drop_cols(df, start_col, end_col):
+	'''
+	drops columns other than date, site and species
+	'''
+
+	species = df.loc[:,start_col:end_col]
+	species.insert(0, 'Site', df['Site'].values, True)
+	species.insert(1, 'Date', df['Date'].values, True)
+
+	return species
 
 def generate_matching_point_codes_simon(data, point_col):
 	'''
@@ -186,10 +215,11 @@ def remove_pc_add_underscore(data, point_col):
 	'''
 	for i in data.index:
 		split_point = data.loc[i,point_col].split('-')
-		if split_point[1][:1] == 'PC':
-			data.loc[i,'Site'] = str(split_point[0] + '_' + split_point[3][2:])
+		if split_point[0][:3] != 'SJI':
+			data.loc[i,'Site'] = str(split_point[0] + '_' + split_point[1][2:])
 		else:
 			data.loc[i,'Site'] = str(split_point[0] + '_' + split_point[1])
+
 	return data
 
 def combine_abundance_matrices(rivers, fragments, newton_2015, newton_2017):
@@ -197,7 +227,7 @@ def combine_abundance_matrices(rivers, fragments, newton_2015, newton_2017):
 	combines all three of the datasets to make one master sheet of all dung beetle abundance data from SAFE and the surrounding landscapes
 	'''
 
-	#create new dataframe for everything to go in 
+	#create new dataframe for everything to go in
 	combined = rivers.append(newton_2017, ignore_index = True, sort = False)
 	combined = combined.append(newton_2015, ignore_index = True, sort = False)
 	combined = combined.append(fragments, ignore_index = True, sort = False)
@@ -220,6 +250,8 @@ def combine_all_points(simon, safe):
 
 	combined = pd.concat([safe,simon], ignore_index = True, sort = False)
 
+	combined = combined[['Site', 'lat', 'lon']]
+
 	return combined
 
 def match_gps_to_abundance(abundance, gps):
@@ -227,6 +259,10 @@ def match_gps_to_abundance(abundance, gps):
 	takes the combined dung beetle dataframe and searches against the gps dataframe for a match
 	'''
 
-	matched = pd.merge(abundance, gps, on='Site')
+	for i in abundance.index:
+		for j in gps.index:
+			if abundance.loc[i,'Site'] == gps.loc[j, 'Site']:
+				abundance.loc[i, 'lon'] = gps.loc[j, 'lon']
+				abundance.loc[i, 'lat'] = gps.loc[j, 'lat']
 
-	return matched
+	return abundance

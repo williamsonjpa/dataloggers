@@ -1,17 +1,20 @@
-setwd('C:/Users/hp/Documents/2018/Dataloggers/Data/Final')
+#stats script for the datalogger data summarised by day
+
+setwd('/home/joe/Documents/Dataloggers/Data/Final')
 library(ggplot2)
 library(gridExtra)
 library(lme4)
 library(anytime)
 library(mgcv)
 
-df<-read.csv('Combined.csv')
+df<-read.csv('Combined_Daily_scale_12.5.csv')
 str(df)
 
 #set some of the variables as the correct type
 df$Point<-as.factor(df$Point)
 df$loggerID<-as.factor(df$loggerID)
-df$Date1<-as.Date(df$Date,format="%d/%m/%Y")
+str(df$Date)
+df$Date<-as.Date(df$Date,format="%d/%m/%Y")
 df<-subset(df,df$Position!='cavity')
 df$Position<-factor(df$Position, levels = c('buffer5m','buffer15m','bufferedge','buffer25m',
                                              'buffer35m','buffer45m','op5m','op15m','op25m',
